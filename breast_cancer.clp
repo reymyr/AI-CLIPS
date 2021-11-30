@@ -242,6 +242,6 @@
 	=>
 	(retract ?p)
 	(printout t "**************************************************************" crlf)
-	(printout t "* Selamat, Anda tidak terprediksi terkena kanker payudara :) *" crlf)
+	(printout t "* Selamat, Anda terprediksi tidak terkena kanker payudara :) *" crlf)
 	(printout t "**************************************************************" crlf)
 )
