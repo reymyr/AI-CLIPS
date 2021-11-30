@@ -47,6 +47,89 @@
   )
 )
 
+; Rule untuk menanyakan worst texture atau mean_smoothness berdasarkan nilai radius_error
+(defrule qWorstTextureOrMeanSmoothness
+	?x <- (radius_error ?re)
+	=>
+	(retract ?x)
+	(if (<= ?re 0.63)
+		then
+			(bind ?wt (ask-question "worst_texture"))
+			(assert (worst_texture_re ?wt))
+		else
+			(bind ?ms (ask-question "mean_smoothness"))
+			(assert (mean_smoothness ?ms))
+	)
+)
+
+; Rule untuk menentukan prediksi breast cancer berdasarkan nilai mean_smoothness
+(defrule predictByMeanSmoothness
+	?x <- (mean_smoothness ?ms)
+	=>
+	(retract ?x)
+	(if (<= ?ms 0.09)
+		then
+			(assert (predict 1))
+		else
+			(assert (predict 0))
+	)
+)
+
+; Rule untuk menentukan prediksi breast cancer berdasarkan nilai worst_texture_re
+(defrule predictByWorstTextureFromRE
+	?x <- (worst_texture_re ?wt)
+	=>
+	(retract ?x)
+	(if (<= ?wt 30.15)
+		then 
+			(assert (predict 1))
+		else
+			(bind ?wa (ask-question "worst_area"))
+			(assert (worst_area ?wa))
+	)
+)
+
+; Rule untuk menentukan prediksi breast cancer berdasarkan nilai worst_area
+(defrule predictByWorstArea
+	?x <- (worst_area ?wa)
+	=>
+	(retract ?x)
+	(if (<= ?wa 641.60)
+		then
+			(assert (predict 1))
+		else
+			(bind ?mr (ask-question "mean_radius"))
+			(assert (mean_radius_wa ?mr))
+	)
+)
+
+; Rule untuk menentukan prediksi breast cancer berdasarkan nilai mean_radius_wa
+(defrule predictByMeanRadiusFromRE
+	?x <- (mean_radius_wa ?mr)
+	=>
+	(retract ?x)
+	(if (<= ?mr 13.45)
+		then
+			(bind ?mt (ask-question "mean_texture"))
+			(assert (mean_texture_mr ?mt))
+		else
+			(assert (predict 1))
+	)
+)
+
+; Rule untuk menentukan prediksi breast cancer berdasarkan nilai mean_texture_mr
+(defrule predictByMeanTextureFromMR
+	?x <- (mean_texture_mr ?mt)
+	=>
+	(retract ?x)
+	(if (<= ?mt 28.79)
+		then
+			(assert (predict 0))
+		else
+			(assert (predict 1))
+	)
+)
+
 ; Rule untuk menentukan prediksi breast cancer berdasarkan nilai worst_perimeter
 (defrule predictByWorstPerimeter
 	?x <- (worst_perimeter ?wp)
