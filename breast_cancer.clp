@@ -43,6 +43,122 @@
 	    (assert (radius_error ?re))
     else 
       (bind ?mt (ask-question "mean_texture" ))
-      (assert (mean_texture ?mt))
+      (assert (mean_texture_wr ?mt))
   )
+)
+
+; Rule untuk menentukan prediksi breast cancer berdasarkan nilai worst_perimeter
+(defrule predictByWorstPerimeter
+	?x <- (worst_perimeter ?wp)
+	=>
+	(retract ?x)
+	(if(<= ?wp 114.45)
+		then
+			(bind ?wt (ask-question "worst_texture"))
+			(assert (worst_texture ?wt))
+		else
+			(assert (predict 0))
+	)
+)
+
+; Rule untuk menanyakan worst_concave_points atau perimeter_error berdasarkan nilai worst_texture
+(defrule qWorstConcavePointsOrPerimeterError
+	?x <- (worst_texture ?wt)
+	=>
+	(retract ?x)
+  (if (<= ?wt 25.65)
+    then
+      (bind ?wcp (ask-question "worst_concave_points" ))
+	    (assert (worst_concave_points ?wcp))
+    else 
+      (bind ?pe (ask-question "perimeter_error" ))
+      (assert (perimeter_error ?pe))
+  )
+)
+
+; Rule untuk menentukan prediksi breast cancer berdasarkan nilai worst_concave_points
+(defrule predictByWorstConcavePoints
+	?x <- (worst_concave_points ?wcp)
+	=>
+	(retract ?x)
+	(if(<= ?wcp 0.17)
+		then
+			(assert (predict 1))
+		else
+			(assert (predict 0))
+	)
+)
+
+; Rule untuk menentukan prediksi breast cancer berdasarkan nilai perimeter_error
+(defrule predictByPerimeterError
+	?x <- (perimeter_error ?pe)
+	=>
+	(retract ?x)
+	(if(<= ?pe 1.56)
+		then
+			(bind ?mr (ask-question "mean_radius"))
+			(assert (mean_radius_pe ?mr))
+		else
+			(assert (predict 0))
+	)
+)
+
+; Rule untuk menentukan prediksi breast cancer berdasarkan nilai mean_radius setelah cek perimeter_error
+(defrule predictByMeanRadiusFromPE
+	?x <- (mean_radius_pe ?mr)
+	=>
+	(retract ?x)
+	(if(<= ?mr 13.34)
+		then
+			(assert (predict 0))
+		else
+			(assert (predict 1))
+	)
+)
+
+; Rule untuk menentukan prediksi breast cancer berdasarkan nilai mean_texture setelah cek worst_radius
+(defrule predictByMeanTextureFromWR
+	?x <- (mean_texture_wr ?mt)
+	=>
+	(retract ?x)
+	(if(<= ?mt 16.19)
+		then
+			(assert (predict 1))
+		else
+			(bind ?cpe (ask-question "concave_points_error"))
+			(assert (concave_points_error ?cpe))
+	)
+)
+
+; Rule untuk menentukan prediksi breast cancer berdasarkan nilai concave_points_error
+(defrule predictByConcavePointsError
+	?x <- (concave_points_error ?cpe)
+	=>
+	(retract ?x)
+	(if(<= ?cpe 0.01)
+		then
+			(assert (predict 0))
+		else
+			(assert (predict 1))
+	)
+)
+
+; Rule untuk menampilkan pesan bahwa user terprediksi kanker payudara
+(defrule predictTrue
+	?p <- (predict 1)
+	=>
+	(retract ?p)
+	(printout t "***********************************************************" crlf)
+	(printout t "* Mohon maaf, Anda terprediksi terkena kanker payudara :( *" crlf)
+	(printout t "***********************************************************" crlf)
+)
+
+; Rule untuk menampilkan pesan bahwa user tidak terprediksi kanker payudara
+(defrule predictFalse
+	?p <- (predict 0)
+	=>
+	(retract ?p)
+	(printout t "**************************************************************" crlf)
+	(printout t "* Selamat, Anda tidak terprediksi terkena kanker payudara :) *" crlf)
+	(printout t "**************************************************************" crlf)
 )
